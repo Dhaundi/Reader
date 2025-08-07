@@ -53,8 +53,8 @@ export const handleChat: RequestHandler = async (req, res) => {
     const text = response.text();
 
     // Add metadata about which documents were referenced
-    const referencedDocs = userDocuments.length > 0 ? 
-      await DocumentProcessor.searchDocuments(userDocuments, message).slice(0, 3).map(doc => ({
+    const referencedDocs = userDocuments.length > 0 ?
+      (await DocumentProcessor.searchDocuments(userDocuments, message)).slice(0, 3).map(doc => ({
         filename: doc.filename,
         type: doc.type,
         wordCount: doc.metadata.wordCount
