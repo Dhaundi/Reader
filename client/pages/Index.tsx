@@ -55,7 +55,7 @@ export default function Index() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your Groq AI-powered document analyst using Llama 3 for ultra-fast, intelligent responses. I combine semantic search, vector embeddings, and advanced language understanding to analyze your documents. I can process PDF, DOCX, HTML, and email files with high accuracy and provide detailed, source-backed answers. Upload documents and ask me anything!',
+      content: 'Hello! I\'m your document analysis assistant. I can process and analyze DOCX, HTML, email, and text files to help you extract information, find dates, identify contacts, and answer questions about your documents. Upload your files and ask me anything!',
       timestamp: new Date()
     }
   ]);
