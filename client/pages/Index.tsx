@@ -206,26 +206,7 @@ export default function Index() {
         };
         setMessages(prev => [...prev, assistantMessage]);
       } else {
-        if (result.type === 'quota_exceeded') {
-          const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Google AI API rate limit exceeded. Please wait a moment and try again.',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, errorMessage]);
-          return;
-        }
-        if (result.type === 'auth_error') {
-          const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Google AI API key is invalid. Please check the configuration.',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, errorMessage]);
-          return;
-        }
+        // Custom AI doesn't have external API limitations
         throw new Error(result.error || 'Chat failed');
       }
     } catch (err) {
