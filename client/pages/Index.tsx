@@ -418,9 +418,16 @@ export default function Index() {
                               {message.metadata && message.metadata.documentsReferenced > 0 && (
                                 <div className="mt-2 pt-2 border-t border-current/20">
                                   <p className="text-xs opacity-70">
-                                    📄 Referenced {message.metadata.documentsReferenced} document(s): {' '}
-                                    {message.metadata.documentDetails.map(doc => doc.filename).join(', ')}
+                                    📄 Referenced {message.metadata.documentsReferenced} document(s)
+                                    {message.metadata.confidence && (
+                                      <span className="ml-2">• Confidence: {Math.round(message.metadata.confidence * 100)}%</span>
+                                    )}
                                   </p>
+                                  {message.metadata.documentDetails && (
+                                    <p className="text-xs opacity-60 mt-1">
+                                      Sources: {message.metadata.documentDetails.map((doc: any) => doc.filename).join(', ')}
+                                    </p>
+                                  )}
                                 </div>
                               )}
                               <p className="text-xs opacity-70 mt-1">
