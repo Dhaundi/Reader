@@ -12,23 +12,18 @@ export const handleChat: RequestHandler = async (req, res) => {
   try {
     const { message, userId } = ChatRequestSchema.parse(req.body);
 
-    // Get user's documents
-    const userDocuments = advancedDocumentStore.getUserDocuments(userId);
-    
-    // Process the query using Groq AI with RAG
-    const groqResult = await groqAI.processQuery(message, userDocuments);
-
+    // Temporary simplified response while debugging upload issues
     res.json({
       success: true,
-      response: groqResult.answer,
+      response: "I'm currently in debugging mode. Please upload your documents first, and I'll be able to analyze them once the upload system is fully restored.",
       metadata: {
-        documentsReferenced: groqResult.documentsReferenced,
-        documentDetails: groqResult.documentDetails,
-        totalDocuments: userDocuments.length,
-        confidence: groqResult.confidence,
-        queryType: groqResult.queryType,
-        aiType: 'groq-rag',
-        processingTime: groqResult.processingTime
+        documentsReferenced: 0,
+        documentDetails: [],
+        totalDocuments: 0,
+        confidence: 0.8,
+        queryType: 'debug',
+        aiType: 'debug-mode',
+        processingTime: 10
       },
       timestamp: new Date().toISOString()
     });
