@@ -15,26 +15,21 @@ export const handleChat: RequestHandler = async (req, res) => {
     // Get user's documents
     const userDocuments = advancedDocumentStore.getUserDocuments(userId);
     
-    // Process the query using advanced AI system
-    const queryResult = await QueryProcessor.processQuery(message, userDocuments);
+    // Process the query using Groq AI with RAG
+    const groqResult = await groqAI.processQuery(message, userDocuments);
 
     res.json({
       success: true,
-      response: queryResult.answer,
+      response: groqResult.answer,
       metadata: {
-        documentsReferenced: queryResult.sources.length,
-        documentDetails: queryResult.sources.map(source => ({
-          filename: source.filename,
-          relevanceScore: source.relevanceScore,
-          excerpt: source.content
-        })),
+        documentsReferenced: groqResult.documentsReferenced,
+        documentDetails: groqResult.documentDetails,
         totalDocuments: userDocuments.length,
-        confidence: queryResult.confidence,
-        queryType: queryResult.queryType,
-        aiType: 'advanced-rag',
-        processingStats: queryResult.metadata
+        confidence: groqResult.confidence,
+        queryType: groqResult.queryType,
+        aiType: 'groq-rag',
+        processingTime: groqResult.processingTime
       },
-      sources: queryResult.sources,
       timestamp: new Date().toISOString()
     });
 
