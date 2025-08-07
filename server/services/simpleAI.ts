@@ -10,6 +10,7 @@ export interface SimpleAIResponse {
     relevanceScore: number;
   }>;
   queryType: string;
+  processingTime: number;
 }
 
 export class SimpleAI {
