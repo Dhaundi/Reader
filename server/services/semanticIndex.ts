@@ -1,6 +1,6 @@
 import natural from 'natural';
 import { Matrix } from 'ml-matrix';
-import * as cosineSimilarity from 'cosine-similarity';
+import cosineSimilarity from 'cosine-similarity';
 import { ProcessedDocument, DocumentChunk } from './advancedDocumentProcessor';
 
 export interface VectorDocument {
