@@ -28,7 +28,7 @@ export default function Index() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m here to help you analyze your documents. Upload your PDF, DOCX, or email files and ask me anything about them.',
+      content: 'Hello! I\'m Google AI and I\'m here to help you analyze your documents. Upload your PDF, DOCX, or email files and ask me anything about them.',
       timestamp: new Date()
     }
   ]);
