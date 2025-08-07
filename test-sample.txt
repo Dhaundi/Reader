@@ -1,0 +1,37 @@
+Subject: Project Meeting Notes
+
+From: john.doe@company.com
+To: team@company.com
+Date: March 15, 2024
+
+Dear Team,
+
+I wanted to share the key points from our project meeting today:
+
+Action Items:
+- Complete the design mockups by March 20, 2024
+- Review the budget proposal ($50,000 for development)
+- Contact Sarah Johnson at sarah.j@vendor.com for quotes
+- Schedule follow-up meeting by March 25, 2024
+
+Important Dates:
+- Project deadline: April 30, 2024
+- Budget approval needed by: March 22, 2024
+- Client presentation: April 5, 2024
+
+Financial Information:
+- Total project cost: $75,000
+- Initial payment: $25,000
+- Balance due on completion: $50,000
+
+Team Members Mentioned:
+- Mike Chen (Project Manager)
+- Lisa Williams (Designer)
+- David Kumar (Developer)
+
+Please review these notes and let me know if I missed anything.
+
+Best regards,
+John Doe
+Project Coordinator
+Phone: (555) 123-4567
