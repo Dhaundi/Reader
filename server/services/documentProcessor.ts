@@ -61,15 +61,10 @@ export class DocumentProcessor {
     }
   }
 
-  private static async extractFromPDF(buffer: Buffer): Promise<string> {
-    try {
-      const data = await pdfParse(buffer);
-      return data.text;
-    } catch (error) {
-      console.error('PDF extraction error:', error);
-      throw new Error('Failed to extract text from PDF');
-    }
-  }
+  // PDF extraction temporarily disabled - will be re-enabled with working library
+  // private static async extractFromPDF(buffer: Buffer): Promise<string> {
+  //   // PDF processing implementation will be added here
+  // }
 
   private static async extractFromDOCX(buffer: Buffer): Promise<string> {
     try {
