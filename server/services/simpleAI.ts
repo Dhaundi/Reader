@@ -112,22 +112,22 @@ These formats allow me to extract and analyze the text content to answer your qu
     
     switch (queryType) {
       case 'summary':
-        return this.generateSummary(combinedContent, documents);
-      
+        return this.generateSummary(combinedContent, processedDocs);
+
       case 'list':
         return this.generateList(query, combinedContent);
-      
+
       case 'temporal':
         return this.findDates(combinedContent);
-      
+
       case 'contact':
         return this.findContacts(combinedContent);
-      
+
       case 'financial':
         return this.findFinancial(combinedContent);
-      
+
       default:
-        return this.generateGeneral(query, combinedContent, documents);
+        return this.generateGeneral(query, combinedContent, processedDocs);
     }
   }
 
