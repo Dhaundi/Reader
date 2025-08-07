@@ -134,15 +134,38 @@ export default function Index() {
         setUploadedFiles(prev => [...prev, ...newFiles]);
         
         const processedCount = newFiles.filter(f => f.processed).length;
-        setSuccess(`Successfully uploaded and processed ${processedCount}/${newFiles.length} file(s)`);
-        
+        const unprocessedCount = newFiles.length - processedCount;
+
+        if (processedCount === newFiles.length) {
+          setSuccess(`Successfully uploaded and analyzed ${processedCount} file(s)`);
+        } else if (processedCount > 0) {
+          setSuccess(`Uploaded ${newFiles.length} file(s): ${processedCount} analyzed, ${unprocessedCount} with limited support`);
+        } else {
+          setSuccess(`Uploaded ${newFiles.length} file(s) with limited analysis support`);
+        }
+
         // Add system message about uploaded files
-        const systemMessage: Message = {
-          id: Date.now().toString(),
-          type: 'assistant',
-          content: `Great! I've processed ${processedCount} document(s): ${newFiles.filter(f => f.processed).map(f => f.name).join(', ')}. ${processedCount > 0 ? 'You can now ask me questions about the content of these documents.' : ''}`,
-          timestamp: new Date()
-        };
+        let messageContent = '';
+        if (processedCount > 0) {
+          const processedNames = newFiles.filter(f => f.processed).map(f => f.name);
+          messageContent = `Great! I've analyzed ${processedCount} document(s): ${processedNames.join(', ')}. You can now ask me questions about the content of these documents.`;
+        }
+
+        if (unprocessedCount > 0) {
+          const unprocessedNames = newFiles.filter(f => !f.processed).map(f => f.name);
+          if (messageContent) messageContent += '\n\n';
+          messageContent += `Note: ${unprocessedCount} file(s) have limited support: ${unprocessedNames.join(', ')}. For full analysis, please upload DOCX, HTML, email, or text files.`;
+        }
+
+        if (messageContent) {
+          const systemMessage: Message = {
+            id: Date.now().toString(),
+            type: 'assistant',
+            content: messageContent,
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, systemMessage]);
+        }
         setMessages(prev => [...prev, systemMessage]);
         
         // Switch to chat tab after upload
