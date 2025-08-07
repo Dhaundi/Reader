@@ -28,6 +28,7 @@ export function createServer() {
   // AI Chat routes
   app.post("/api/chat", handleChat);
   app.get("/api/chat/history", getChatHistory);
+  app.get("/api/chat/capabilities", getChatCapabilities);
 
   // Document analysis routes
   app.get("/api/documents/summary", getDocumentSummary);
