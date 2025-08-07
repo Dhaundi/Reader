@@ -76,9 +76,9 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
         filename: doc.filename,
         type: doc.type,
         wordCount: doc.metadata.wordCount,
-        chunkCount: doc.chunks.length,
+        chunkCount: 1, // Simple processor doesn't chunk
         extractedAt: doc.metadata.extractedAt,
-        keywords: doc.metadata.keywords.slice(0, 5)
+        keywords: [] // Simple processor doesn't extract keywords
       })),
       indexStats: simpleDocumentStore.getStats()
     };
