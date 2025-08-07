@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import { simpleParser } from 'mailparser';
 import { parse } from 'node-html-parser';
