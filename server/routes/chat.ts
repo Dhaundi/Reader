@@ -137,6 +137,7 @@ export const getChatCapabilities: RequestHandler = (req, res) => {
 
 // Helper method to get top keywords across all documents
 function getTopKeywords(documents: any[]): string[] {
+  if (!documents || documents.length === 0) return [];
   const allKeywords: { [key: string]: number } = {};
   
   documents.forEach(doc => {
