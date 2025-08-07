@@ -262,7 +262,7 @@ export default function Index() {
               <h1 className="text-xl font-bold">Advanced RAG DocAnalyzer</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
-              Custom AI Engine
+              Advanced RAG System
             </Badge>
           </div>
         </div>
