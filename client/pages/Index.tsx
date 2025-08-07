@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react';
-import { Upload, MessageCircle, FileText, Mail, Send, Paperclip } from 'lucide-react';
+import { Upload, MessageCircle, FileText, Mail, Send, Paperclip, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Message {
   id: string;
@@ -34,45 +35,62 @@ export default function Index() {
   const [inputMessage, setInputMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
+    setError(null);
     
-    for (const file of Array.from(files)) {
-      // Validate file type
-      const allowedTypes = [
-        'application/pdf',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/msword',
-        'message/rfc822',
-        'text/plain'
-      ];
-      
-      if (!allowedTypes.includes(file.type) && !file.name.endsWith('.eml')) {
-        alert('Please upload only PDF, DOCX, or email files.');
-        continue;
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('files', file);
+      });
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
       }
 
-      const newFile: UploadedFile = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        type: file.type || 'email',
-        size: file.size
-      };
-
-      setUploadedFiles(prev => [...prev, newFile]);
+      const result = await response.json();
       
-      // Here you would upload to your backend
-      // await uploadFile(file);
-    }
-    
-    setIsUploading(false);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      if (result.success) {
+        const newFiles: UploadedFile[] = result.files.map((file: any) => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          size: file.size
+        }));
+        
+        setUploadedFiles(prev => [...prev, ...newFiles]);
+        
+        // Add system message about uploaded files
+        const systemMessage: Message = {
+          id: Date.now().toString(),
+          type: 'assistant',
+          content: `Successfully uploaded ${newFiles.length} file(s): ${newFiles.map(f => f.name).join(', ')}. You can now ask questions about these documents.`,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, systemMessage]);
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to upload files');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -87,20 +105,55 @@ export default function Index() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsSending(true);
+    setError(null);
 
-    // Simulate AI response - replace with actual ChatGPT API call
-    setTimeout(() => {
-      const assistantMessage: Message = {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          files: uploadedFiles.map(f => f.id)
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Chat failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: result.response,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        throw new Error(result.error || 'Chat failed');
+      }
+    } catch (err) {
+      console.error('Chat error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send message');
+      
+      // Add error message to chat
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'I understand your question about the uploaded documents. I would analyze the content and provide insights based on the documents you\'ve shared.',
+        content: 'Sorry, I encountered an error processing your message. Please try again.',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsSending(false);
-    }, 1500);
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -137,6 +190,13 @@ export default function Index() {
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {error && (
+          <Alert className="mb-6 border-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8 h-[calc(100vh-8rem)]">
           {/* Upload Section */}
           <div className="lg:col-span-1 space-y-6">
@@ -159,7 +219,7 @@ export default function Index() {
                     <div>
                       <p className="text-sm font-medium">Click to upload files</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        PDF, DOCX, or Email files
+                        PDF, DOCX, or Email files (max 10MB each)
                       </p>
                     </div>
                   </div>
