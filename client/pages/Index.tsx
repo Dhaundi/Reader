@@ -141,7 +141,17 @@ export default function Index() {
           const errorMessage: Message = {
             id: (Date.now() + 1).toString(),
             type: 'assistant',
-            content: '⚠️ OpenAI API quota exceeded. Please check your billing details at https://platform.openai.com/account/billing or try again later.',
+            content: '⚠️ Google AI API quota exceeded. Please check your billing details at https://aistudio.google.com/ or try again later.',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          return;
+        }
+        if (result.type === 'auth_error') {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'assistant',
+            content: '⚠️ Google AI API key is invalid. Please check your API key configuration.',
             timestamp: new Date()
           };
           setMessages(prev => [...prev, errorMessage]);
