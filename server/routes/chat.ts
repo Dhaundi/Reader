@@ -69,12 +69,8 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
         types[type] = (types[type] || 0) + 1;
         return types;
       }, {} as Record<string, number>),
-      languages: userDocuments.reduce((langs, doc) => {
-        const lang = doc.metadata.language || 'unknown';
-        langs[lang] = (langs[lang] || 0) + 1;
-        return langs;
-      }, {} as Record<string, number>),
-      topKeywords: getTopKeywords(userDocuments),
+      languages: { 'unknown': userDocuments.length }, // Simple processor doesn't detect language
+      topKeywords: [], // Simple processor doesn't extract keywords
       documents: userDocuments.map(doc => ({
         id: doc.id,
         filename: doc.filename,
