@@ -25,5 +25,12 @@ export function createServer() {
   app.post("/api/upload", upload.array('files'), handleFileUpload);
   app.get("/api/files", getUploadedFiles);
 
+  // AI Chat routes
+  app.post("/api/chat", handleChat);
+  app.get("/api/chat/history", getChatHistory);
+
+  // Document analysis routes
+  app.get("/api/documents/summary", getDocumentSummary);
+
   return app;
 }
