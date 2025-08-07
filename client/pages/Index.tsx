@@ -259,7 +259,7 @@ export default function Index() {
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <Brain className="h-5 w-5 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-bold">DocAI Analyst</h1>
+              <h1 className="text-xl font-bold">Smart DocAnalyzer</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
               Custom AI Engine
