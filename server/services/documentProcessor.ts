@@ -3,7 +3,6 @@ import path from 'path';
 import mammoth from 'mammoth';
 import { simpleParser } from 'mailparser';
 import { parse } from 'node-html-parser';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 
 export interface ProcessedDocument {
   id: string;
@@ -28,8 +27,9 @@ export class DocumentProcessor {
       const fileBuffer = fs.readFileSync(filePath);
       
       if (fileType.includes('pdf') || filename.toLowerCase().endsWith('.pdf')) {
-        content = await this.extractFromPDF(fileBuffer);
-        metadata.pages = content.split('\f').length; // Page breaks in PDF text
+        // PDF support will be added in a future update
+        content = `[PDF Document: ${filename}]\n\nThis PDF file has been successfully uploaded. Currently, text extraction from PDF files is not available, but the file is stored and can be processed when PDF support is enabled. For immediate text analysis, please upload DOCX or email files.`;
+        metadata.pages = 1;
       } 
       else if (fileType.includes('word') || fileType.includes('document') || 
                filename.toLowerCase().endsWith('.docx') || filename.toLowerCase().endsWith('.doc')) {
@@ -59,26 +59,6 @@ export class DocumentProcessor {
     } catch (error) {
       console.error('Error processing document:', error);
       throw new Error(`Failed to process document: ${filename}`);
-    }
-  }
-
-  private static async extractFromPDF(buffer: Buffer): Promise<string> {
-    try {
-      const pdfData = new Uint8Array(buffer);
-      const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-      let fullText = '';
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(' ');
-        fullText += pageText + '\n\f'; // Add page break
-      }
-
-      return fullText.trim();
-    } catch (error) {
-      console.error('PDF extraction error:', error);
-      return `[PDF Document - Text extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}]`;
     }
   }
 
