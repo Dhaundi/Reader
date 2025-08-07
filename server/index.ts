@@ -2,14 +2,16 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { handleFileUpload, upload, getUploadedFiles } from "./routes/upload";
+import { handleChat, getChatHistory } from "./routes/chat";
 
 export function createServer() {
   const app = express();
 
   // Middleware
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -18,6 +20,14 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // File upload routes
+  app.post("/api/upload", upload.array('files'), handleFileUpload);
+  app.get("/api/files", getUploadedFiles);
+
+  // Chat routes
+  app.post("/api/chat", handleChat);
+  app.get("/api/chat/history", getChatHistory);
 
   return app;
 }
