@@ -127,7 +127,7 @@ export default function Index() {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -137,6 +137,16 @@ export default function Index() {
         };
         setMessages(prev => [...prev, assistantMessage]);
       } else {
+        if (result.type === 'quota_exceeded') {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'assistant',
+            content: '⚠️ OpenAI API quota exceeded. Please check your billing details at https://platform.openai.com/account/billing or try again later.',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          return;
+        }
         throw new Error(result.error || 'Chat failed');
       }
     } catch (err) {
