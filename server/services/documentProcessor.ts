@@ -62,10 +62,25 @@ export class DocumentProcessor {
     }
   }
 
-  // PDF extraction temporarily disabled - will be re-enabled with working library
-  // private static async extractFromPDF(buffer: Buffer): Promise<string> {
-  //   // PDF processing implementation will be added here
-  // }
+  private static async extractFromPDF(buffer: Buffer): Promise<string> {
+    try {
+      const pdfData = new Uint8Array(buffer);
+      const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n\f'; // Add page break
+      }
+
+      return fullText.trim();
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      return `[PDF Document - Text extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}]`;
+    }
+  }
 
   private static async extractFromDOCX(buffer: Buffer): Promise<string> {
     try {
