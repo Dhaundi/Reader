@@ -27,8 +27,20 @@ export class SimpleDocumentProcessor {
 
       // Extract text based on file type
       if (fileType.includes('pdf') || filename.toLowerCase().endsWith('.pdf')) {
-        // Temporarily disable PDF processing to avoid library issues
-        content = `[PDF Document: ${filename}]\n\nThis PDF file has been uploaded successfully. PDF text extraction is temporarily disabled. For full document analysis, please upload DOCX or email files.`;
+        // PDF processing is temporarily disabled
+        content = `PDF Document: ${filename}
+
+✅ UPLOADED SUCCESSFULLY
+
+📄 PDF text extraction is currently disabled due to technical limitations. Your file has been uploaded and stored, but content analysis is not available.
+
+💡 For full document analysis and AI chat capabilities, please upload:
+• DOCX or DOC files (Microsoft Word)
+• HTML files
+• Email files (.eml, .msg)
+• Plain text files (.txt)
+
+Your PDF file is safely stored and can be downloaded if needed.`;
         processed = false;
       } 
       else if (fileType.includes('word') || fileType.includes('document') || 
