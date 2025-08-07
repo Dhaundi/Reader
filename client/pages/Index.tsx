@@ -52,7 +52,7 @@ export default function Index() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your custom document analysis assistant. I can help you extract information, summarize content, find dates, identify contacts, and discover action items from your DOCX and email files. Upload documents and ask me anything!',
+      content: 'Hello! I\'m your advanced RAG-powered document analyst. I use semantic search, vector embeddings, and intelligent chunking to understand your documents deeply. I can analyze PDF, DOCX, HTML, and email files with high accuracy and provide source-backed answers. Upload documents and ask complex questions!',
       timestamp: new Date()
     }
   ]);
