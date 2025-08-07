@@ -64,6 +64,9 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
           file.mimetype
         );
 
+        // Store the processed document
+        simpleDocumentStore.addDocument(processedDoc, userId);
+
         processedFiles.push({
           id: processedDoc.id,
           name: file.originalname,
