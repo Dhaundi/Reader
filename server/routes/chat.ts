@@ -60,7 +60,7 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
     const summary = {
       totalDocuments: userDocuments.length,
       totalWordCount: userDocuments.reduce((sum, doc) => sum + doc.metadata.wordCount, 0),
-      totalChunks: userDocuments.reduce((sum, doc) => sum + doc.chunks.length, 0),
+      totalChunks: userDocuments.length, // Simple processor doesn't chunk documents
       documentTypes: userDocuments.reduce((types, doc) => {
         const type = doc.type.includes('pdf') ? 'PDF' : 
                     doc.type.includes('word') ? 'DOCX' : 
