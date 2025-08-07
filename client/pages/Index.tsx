@@ -396,8 +396,8 @@ export default function Index() {
                               </div>
                             </div>
                           </div>
-                          <Badge variant={file.processed ? "default" : "secondary"}>
-                            {file.processed ? "Analyzed" : "Processing"}
+                          <Badge variant={file.processed ? "default" : "outline"} className={file.processed ? "" : "text-orange-600 border-orange-300"}>
+                            {file.processed ? "Analyzed" : "Limited Support"}
                           </Badge>
                         </div>
                       ))}
