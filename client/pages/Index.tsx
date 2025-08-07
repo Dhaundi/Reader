@@ -52,7 +52,7 @@ export default function Index() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your AI document analyst. Upload your PDF, DOCX, or email files and I\'ll help you analyze and extract insights from them. Ask me anything about your documents!',
+      content: 'Hello! I\'m your custom document analysis assistant. I can help you extract information, summarize content, find dates, identify contacts, and discover action items from your DOCX and email files. Upload documents and ask me anything!',
       timestamp: new Date()
     }
   ]);
