@@ -193,7 +193,7 @@ export default function Index() {
               <h1 className="text-xl font-bold">DocChat AI</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
-              Powered by ChatGPT
+              Powered by Google AI
             </Badge>
           </div>
         </div>
