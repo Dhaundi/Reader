@@ -16,17 +16,20 @@ export interface SimpleAIResponse {
 export class SimpleAI {
   
   static async processQuery(message: string, documents: SimpleProcessedDocument[]): Promise<SimpleAIResponse> {
+    const startTime = Date.now();
     const lowercaseMessage = message.toLowerCase();
-    
+
     // Find relevant documents
     const relevantDocs = this.findRelevantDocuments(documents, message);
-    
+
     // Determine query type
     const queryType = this.analyzeQueryType(message);
-    
+
     // Generate response
     const answer = this.generateAnswer(message, relevantDocs, queryType);
-    
+
+    const processingTime = Date.now() - startTime;
+
     return {
       answer,
       confidence: this.calculateConfidence(relevantDocs, message),
@@ -36,7 +39,8 @@ export class SimpleAI {
         wordCount: doc.metadata.wordCount,
         relevanceScore: 0.8
       })),
-      queryType
+      queryType,
+      processingTime
     };
   }
 
