@@ -166,7 +166,6 @@ export default function Index() {
           };
           setMessages(prev => [...prev, systemMessage]);
         }
-        setMessages(prev => [...prev, systemMessage]);
         
         // Switch to chat tab after upload
         setActiveTab('chat');
