@@ -24,9 +24,5 @@ export function createServer() {
   app.post("/api/upload", upload.array('files'), handleFileUpload);
   app.get("/api/files", getUploadedFiles);
 
-  // Chat routes
-  app.post("/api/chat", handleChat);
-  app.get("/api/chat/history", getChatHistory);
-
   return app;
 }
