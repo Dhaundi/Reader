@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleFileUpload, upload, getUploadedFiles } from "./routes/upload";
-import { handleChat, getChatHistory, getDocumentSummary, getChatCapabilities } from "./routes/chat";
+import { handleChat, getChatHistory, getDocumentSummary, getChatCapabilities, searchDocuments } from "./routes/chat";
 
 export function createServer() {
   const app = express();
