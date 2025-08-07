@@ -260,10 +260,12 @@ export default function Index() {
 
   const suggestedQuestions = [
     "Summarize the main points from my documents",
-    "What are the key dates mentioned?",
-    "Find any action items or requirements",
-    "Extract contact information",
-    "What contracts or agreements are discussed?"
+    "What dates and deadlines are mentioned?",
+    "Find contact information (emails, phones)",
+    "Identify action items and requirements",
+    "What financial amounts are discussed?",
+    "Who are the people mentioned?",
+    "Search for specific terms"
   ];
 
   return (
