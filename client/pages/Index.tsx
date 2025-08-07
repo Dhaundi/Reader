@@ -141,7 +141,7 @@ export default function Index() {
           const errorMessage: Message = {
             id: (Date.now() + 1).toString(),
             type: 'assistant',
-            content: '⚠️ Google AI API quota exceeded. Please check your billing details at https://aistudio.google.com/ or try again later.',
+            content: '⚠️ Google AI API rate limit exceeded. Please wait a moment and try again. If this persists, check your quota at https://aistudio.google.com/',
             timestamp: new Date()
           };
           setMessages(prev => [...prev, errorMessage]);
