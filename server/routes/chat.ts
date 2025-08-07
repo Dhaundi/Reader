@@ -79,7 +79,7 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
         langs[lang] = (langs[lang] || 0) + 1;
         return langs;
       }, {} as Record<string, number>),
-      topKeywords: this.getTopKeywords(userDocuments),
+      topKeywords: getTopKeywords(userDocuments),
       documents: userDocuments.map(doc => ({
         id: doc.id,
         filename: doc.filename,
