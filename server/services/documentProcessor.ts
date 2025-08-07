@@ -81,7 +81,10 @@ export class DocumentProcessor {
       // Add email headers
       if (parsed.subject) content += `Subject: ${parsed.subject}\n\n`;
       if (parsed.from?.text) content += `From: ${parsed.from.text}\n`;
-      if (parsed.to?.text) content += `To: ${parsed.to.text}\n`;
+      if (parsed.to) {
+        const toText = Array.isArray(parsed.to) ? parsed.to.map(addr => addr.text || addr.address || '').join(', ') : (parsed.to.text || parsed.to.address || '');
+        content += `To: ${toText}\n`;
+      }
       if (parsed.date) content += `Date: ${parsed.date}\n\n`;
       
       // Add email body
