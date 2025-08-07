@@ -32,6 +32,7 @@ export function createServer() {
 
   // Document analysis routes
   app.get("/api/documents/summary", getDocumentSummary);
+  app.get("/api/documents/search", searchDocuments);
 
   return app;
 }
