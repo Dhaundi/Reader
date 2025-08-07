@@ -1,19 +1,10 @@
 import { useState, useRef } from 'react';
-import { Upload, MessageCircle, FileText, Mail, Send, Paperclip, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Mail, Paperclip, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-interface Message {
-  id: string;
-  type: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
 
 interface UploadedFile {
   id: string;
@@ -24,18 +15,9 @@ interface UploadedFile {
 
 export default function Index() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'assistant',
-      content: 'Hello! I\'m Google AI and I\'m here to help you analyze your documents. Upload your PDF, DOCX, or email files and ask me anything about them.',
-      timestamp: new Date()
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +26,7 @@ export default function Index() {
 
     setIsUploading(true);
     setError(null);
+    setSuccess(null);
     
     try {
       const formData = new FormData();
@@ -71,15 +54,7 @@ export default function Index() {
         }));
         
         setUploadedFiles(prev => [...prev, ...newFiles]);
-        
-        // Add system message about uploaded files
-        const systemMessage: Message = {
-          id: Date.now().toString(),
-          type: 'assistant',
-          content: `Successfully uploaded ${newFiles.length} file(s): ${newFiles.map(f => f.name).join(', ')}. You can now ask questions about these documents.`,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, systemMessage]);
+        setSuccess(`Successfully uploaded ${newFiles.length} file(s)`);
       } else {
         throw new Error(result.error || 'Upload failed');
       }
@@ -94,86 +69,14 @@ export default function Index() {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isSending) return;
+  const handleRemoveFile = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
+  };
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: inputMessage,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    const currentMessage = inputMessage;
-    setInputMessage('');
-    setIsSending(true);
+  const handleClearAll = () => {
+    setUploadedFiles([]);
+    setSuccess(null);
     setError(null);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: currentMessage,
-          files: uploadedFiles.map(f => f.id)
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Chat failed: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          type: 'assistant',
-          content: result.response,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        if (result.type === 'quota_exceeded') {
-          const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Google AI API rate limit exceeded. Please wait a moment and try again. If this persists, check your quota at https://aistudio.google.com/',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, errorMessage]);
-          return;
-        }
-        if (result.type === 'auth_error') {
-          const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Google AI API key is invalid. Please check your API key configuration.',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, errorMessage]);
-          return;
-        }
-        throw new Error(result.error || 'Chat failed');
-      }
-    } catch (err) {
-      console.error('Chat error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-      
-      // Add error message to chat
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: 'Sorry, I encountered an error processing your message. Please try again.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsSending(false);
-    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -185,9 +88,9 @@ export default function Index() {
   };
 
   const getFileIcon = (type: string) => {
-    if (type.includes('pdf')) return <FileText className="h-4 w-4 text-red-500" />;
-    if (type.includes('word') || type.includes('document')) return <FileText className="h-4 w-4 text-blue-500" />;
-    return <Mail className="h-4 w-4 text-green-500" />;
+    if (type.includes('pdf')) return <FileText className="h-5 w-5 text-red-500" />;
+    if (type.includes('word') || type.includes('document')) return <FileText className="h-5 w-5 text-blue-500" />;
+    return <Mail className="h-5 w-5 text-green-500" />;
   };
 
   return (
@@ -198,18 +101,19 @@ export default function Index() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <MessageCircle className="h-5 w-5 text-primary-foreground" />
+                <Upload className="h-5 w-5 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-bold">DocChat AI</h1>
+              <h1 className="text-xl font-bold">DocUpload</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
-              Powered by Google AI
+              Secure Document Storage
             </Badge>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Alerts */}
         {error && (
           <Alert className="mb-6 border-destructive">
             <AlertCircle className="h-4 w-4" />
@@ -217,152 +121,143 @@ export default function Index() {
           </Alert>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-8 h-[calc(100vh-8rem)]">
+        {success && (
+          <Alert className="mb-6 border-green-500 bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Upload Your Documents</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Securely upload and manage your PDF, DOCX, and email files. All uploads are processed and stored safely.
+          </p>
+        </div>
+
+        <div className="grid gap-8">
           {/* Upload Section */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="flex items-center justify-center space-x-2">
-                  <Upload className="h-5 w-5" />
-                  <span>Upload Documents</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div 
-                  className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <div className="flex flex-col items-center space-y-3">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Paperclip className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Click to upload files</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        PDF, DOCX, or Email files (max 10MB each)
-                      </p>
-                    </div>
+          <Card className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="flex items-center justify-center space-x-2">
+                <Upload className="h-6 w-6" />
+                <span>Upload Documents</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div 
+                className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-12 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Paperclip className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-medium">Click to upload files</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      or drag and drop your files here
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Supports PDF, DOCX, DOC, and Email files (max 10MB each)
+                    </p>
                   </div>
                 </div>
-                
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.docx,.doc,.eml,.msg"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                
+              </div>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept=".pdf,.docx,.doc,.eml,.msg"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              
+              <div className="flex gap-3">
                 <Button 
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="w-full"
+                  className="flex-1"
+                  size="lg"
                 >
                   {isUploading ? 'Uploading...' : 'Choose Files'}
                 </Button>
-              </CardContent>
-            </Card>
+                
+                {uploadedFiles.length > 0 && (
+                  <Button 
+                    onClick={handleClearAll}
+                    variant="outline"
+                    size="lg"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Uploaded Files */}
-            {uploadedFiles.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Uploaded Files ({uploadedFiles.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-48">
-                    <div className="space-y-2">
-                      {uploadedFiles.map((file) => (
-                        <div key={file.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
-                          <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            {getFileIcon(file.type)}
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium truncate">{file.name}</p>
-                              <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Chat Section */}
-          <div className="lg:col-span-2">
-            <Card className="h-full flex flex-col">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageCircle className="h-5 w-5" />
-                  <span>Chat with your documents</span>
+          {/* Uploaded Files */}
+          {uploadedFiles.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Uploaded Files ({uploadedFiles.length})</span>
+                  <Badge variant="secondary">{uploadedFiles.length} files</Badge>
                 </CardTitle>
               </CardHeader>
-              
-              <Separator />
-              
-              <CardContent className="flex-1 flex flex-col p-0">
-                {/* Messages */}
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                          message.type === 'user' 
-                            ? 'bg-primary text-primary-foreground ml-12' 
-                            : 'bg-muted mr-12'
-                        }`}>
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          <p className="text-xs opacity-70 mt-1">
-                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    {isSending && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted rounded-lg px-4 py-2 mr-12">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+              <CardContent>
+                <ScrollArea className="h-96">
+                  <div className="space-y-3">
+                    {uploadedFiles.map((file) => (
+                      <div key={file.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          {getFileIcon(file.type)}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium truncate">{file.name}</p>
+                            <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
                           </div>
                         </div>
+                        <Button
+                          onClick={() => handleRemoveFile(file.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          Remove
+                        </Button>
                       </div>
-                    )}
+                    ))}
                   </div>
                 </ScrollArea>
+              </CardContent>
+            </Card>
+          )}
 
-                {/* Input */}
-                <div className="p-4 border-t">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      placeholder="Ask about your documents..."
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      disabled={isSending}
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={handleSendMessage}
-                      disabled={!inputMessage.trim() || isSending}
-                      size="icon"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Upload documents and ask questions about their content
-                  </p>
-                </div>
+          {/* Info Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mt-8">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <FileText className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Multiple Formats</h3>
+                <p className="text-sm text-muted-foreground">Support for PDF, DOCX, DOC, and email files</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 text-center">
+                <Upload className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Easy Upload</h3>
+                <p className="text-sm text-muted-foreground">Drag & drop or click to upload multiple files at once</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 text-center">
+                <CheckCircle className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Secure Storage</h3>
+                <p className="text-sm text-muted-foreground">Your documents are safely stored and managed</p>
               </CardContent>
             </Card>
           </div>
