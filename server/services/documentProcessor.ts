@@ -27,8 +27,8 @@ export class DocumentProcessor {
       const fileBuffer = fs.readFileSync(filePath);
       
       if (fileType.includes('pdf') || filename.toLowerCase().endsWith('.pdf')) {
-        content = await this.extractFromPDF(fileBuffer);
-        metadata.pages = content.split('\n\n').length; // Rough page estimation
+        content = `[PDF Document: ${filename}]\n\nPDF text extraction is currently being configured. The file has been uploaded successfully but text content extraction is not yet available for PDF files. Please use DOCX or email files for full text analysis, or contact support for PDF processing capabilities.`;
+        metadata.pages = 1;
       } 
       else if (fileType.includes('word') || fileType.includes('document') || 
                filename.toLowerCase().endsWith('.docx') || filename.toLowerCase().endsWith('.doc')) {
