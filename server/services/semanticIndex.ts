@@ -144,7 +144,8 @@ export class SemanticIndex {
 
   // Tokenize text
   private tokenize(text: string): string[] {
-    const tokens = natural.WordTokenizer().tokenize(text.toLowerCase()) || [];
+    const tokenizer = new natural.WordTokenizer();
+    const tokens = tokenizer.tokenize(text.toLowerCase()) || [];
     return tokens.filter(token => token.length > 2 && /^[a-zA-Z]+$/.test(token));
   }
 
