@@ -108,7 +108,7 @@ export class DocumentProcessor {
     }
   }
 
-  static async searchDocuments(documents: ProcessedDocument[], query: string): Promise<ProcessedDocument[]> {
+  static searchDocuments(documents: ProcessedDocument[], query: string): ProcessedDocument[] {
     const lowercaseQuery = query.toLowerCase();
     const queryWords = lowercaseQuery.split(/\s+/).filter(word => word.length > 0);
     
