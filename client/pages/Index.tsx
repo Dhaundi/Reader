@@ -1,17 +1,29 @@
-import { useState, useRef, useEffect } from 'react';
-import { Upload, MessageCircle, FileText, Mail, Send, Paperclip, CheckCircle, AlertCircle, Brain, Search, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useRef, useEffect } from "react";
+import {
+  Upload,
+  MessageCircle,
+  FileText,
+  Mail,
+  Send,
+  Paperclip,
+  CheckCircle,
+  AlertCircle,
+  Brain,
+  Search,
+  BarChart3,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Message {
   id: string;
-  type: 'user' | 'assistant';
+  type: "user" | "assistant";
   content: string;
   timestamp: Date;
   metadata?: {
@@ -53,24 +65,26 @@ export default function Index() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      type: 'assistant',
-      content: 'Hello! I\'m your document analysis assistant. I can process and analyze DOCX, HTML, email, and text files to help you extract information, find dates, identify contacts, and answer questions about your documents. Upload your files and ask me anything!',
-      timestamp: new Date()
-    }
+      id: "1",
+      type: "assistant",
+      content:
+        "Hello! I'm your document analysis assistant. I can process and analyze DOCX, HTML, email, and text files to help you extract information, find dates, identify contacts, and answer questions about your documents. Upload your files and ask me anything!",
+      timestamp: new Date(),
+    },
   ]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [documentSummary, setDocumentSummary] = useState<DocumentSummary | null>(null);
-  const [activeTab, setActiveTab] = useState('upload');
+  const [documentSummary, setDocumentSummary] =
+    useState<DocumentSummary | null>(null);
+  const [activeTab, setActiveTab] = useState("upload");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -85,33 +99,35 @@ export default function Index() {
 
   const fetchDocumentSummary = async () => {
     try {
-      const response = await fetch('/api/documents/summary');
+      const response = await fetch("/api/documents/summary");
       if (response.ok) {
         const summary = await response.json();
         setDocumentSummary(summary);
       }
     } catch (error) {
-      console.error('Error fetching document summary:', error);
+      console.error("Error fetching document summary:", error);
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const formData = new FormData();
-      Array.from(files).forEach(file => {
-        formData.append('files', file);
+      Array.from(files).forEach((file) => {
+        formData.append("files", file);
       });
-      formData.append('userId', 'default');
+      formData.append("userId", "default");
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
@@ -120,7 +136,7 @@ export default function Index() {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         const newFiles: UploadedFile[] = result.files.map((file: any) => ({
           id: file.id,
@@ -128,61 +144,71 @@ export default function Index() {
           type: file.type,
           size: file.size,
           wordCount: file.wordCount,
-          processed: file.processed
+          processed: file.processed,
         }));
-        
-        setUploadedFiles(prev => [...prev, ...newFiles]);
-        
-        const processedCount = newFiles.filter(f => f.processed).length;
+
+        setUploadedFiles((prev) => [...prev, ...newFiles]);
+
+        const processedCount = newFiles.filter((f) => f.processed).length;
         const unprocessedCount = newFiles.length - processedCount;
 
         if (processedCount === newFiles.length) {
-          setSuccess(`Successfully uploaded and analyzed ${processedCount} file(s)`);
+          setSuccess(
+            `Successfully uploaded and analyzed ${processedCount} file(s)`,
+          );
         } else if (processedCount > 0) {
-          setSuccess(`Uploaded ${newFiles.length} file(s): ${processedCount} analyzed, ${unprocessedCount} with limited support`);
+          setSuccess(
+            `Uploaded ${newFiles.length} file(s): ${processedCount} analyzed, ${unprocessedCount} with limited support`,
+          );
         } else {
-          setSuccess(`Uploaded ${newFiles.length} file(s) with limited analysis support`);
+          setSuccess(
+            `Uploaded ${newFiles.length} file(s) with limited analysis support`,
+          );
         }
 
         // Add system message about uploaded files
-        let messageContent = '';
+        let messageContent = "";
         if (processedCount > 0) {
-          const processedNames = newFiles.filter(f => f.processed).map(f => f.name);
-          messageContent = `Great! I've analyzed ${processedCount} document(s): ${processedNames.join(', ')}. You can now ask me questions about the content of these documents.`;
+          const processedNames = newFiles
+            .filter((f) => f.processed)
+            .map((f) => f.name);
+          messageContent = `Great! I've analyzed ${processedCount} document(s): ${processedNames.join(", ")}. You can now ask me questions about the content of these documents.`;
         }
 
         if (unprocessedCount > 0) {
-          const unprocessedNames = newFiles.filter(f => !f.processed).map(f => f.name);
-          if (messageContent) messageContent += '\n\n';
-          messageContent += `Note: ${unprocessedCount} file(s) have limited support: ${unprocessedNames.join(', ')}. For full analysis, please upload DOCX, HTML, email, or text files.`;
+          const unprocessedNames = newFiles
+            .filter((f) => !f.processed)
+            .map((f) => f.name);
+          if (messageContent) messageContent += "\n\n";
+          messageContent += `Note: ${unprocessedCount} file(s) have limited support: ${unprocessedNames.join(", ")}. For full analysis, please upload DOCX, HTML, email, or text files.`;
         }
 
         if (messageContent) {
           const systemMessage: Message = {
             id: Date.now().toString(),
-            type: 'assistant',
+            type: "assistant",
             content: messageContent,
-            timestamp: new Date()
+            timestamp: new Date(),
           };
-          setMessages(prev => [...prev, systemMessage]);
+          setMessages((prev) => [...prev, systemMessage]);
         }
-        
+
         // Switch to chat tab after upload
-        setActiveTab('chat');
-        
+        setActiveTab("chat");
+
         if (result.processingErrors && result.processingErrors.length > 0) {
-          console.warn('Processing errors:', result.processingErrors);
+          console.warn("Processing errors:", result.processingErrors);
         }
       } else {
-        throw new Error(result.error || 'Upload failed');
+        throw new Error(result.error || "Upload failed");
       }
     } catch (err) {
-      console.error('Upload error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to upload files');
+      console.error("Upload error:", err);
+      setError(err instanceof Error ? err.message : "Failed to upload files");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -192,26 +218,26 @@ export default function Index() {
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: "user",
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     const currentMessage = inputMessage;
-    setInputMessage('');
+    setInputMessage("");
     setIsSending(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: currentMessage,
-          userId: 'default'
+          userId: "default",
         }),
       });
 
@@ -220,66 +246,77 @@ export default function Index() {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
-          type: 'assistant',
+          type: "assistant",
           content: result.response,
           timestamp: new Date(),
-          metadata: result.metadata
+          metadata: result.metadata,
         };
-        setMessages(prev => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        if (result.type === 'quota_exceeded' || result.error?.includes('Rate limit')) {
+        if (
+          result.type === "quota_exceeded" ||
+          result.error?.includes("Rate limit")
+        ) {
           const errorMessage: Message = {
             id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Groq AI rate limit exceeded. Please wait a moment and try again.',
-            timestamp: new Date()
+            type: "assistant",
+            content:
+              "⚠️ Groq AI rate limit exceeded. Please wait a moment and try again.",
+            timestamp: new Date(),
           };
-          setMessages(prev => [...prev, errorMessage]);
+          setMessages((prev) => [...prev, errorMessage]);
           return;
         }
-        if (result.type === 'auth_error' || result.error?.includes('authentication')) {
+        if (
+          result.type === "auth_error" ||
+          result.error?.includes("authentication")
+        ) {
           const errorMessage: Message = {
             id: (Date.now() + 1).toString(),
-            type: 'assistant',
-            content: '⚠️ Groq AI authentication failed. Please check the API configuration.',
-            timestamp: new Date()
+            type: "assistant",
+            content:
+              "⚠️ Groq AI authentication failed. Please check the API configuration.",
+            timestamp: new Date(),
           };
-          setMessages(prev => [...prev, errorMessage]);
+          setMessages((prev) => [...prev, errorMessage]);
           return;
         }
-        throw new Error(result.error || 'Chat failed');
+        throw new Error(result.error || "Chat failed");
       }
     } catch (err) {
-      console.error('Chat error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-      
+      console.error("Chat error:", err);
+      setError(err instanceof Error ? err.message : "Failed to send message");
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: 'Sorry, I encountered an error processing your message. Please try again.',
-        timestamp: new Date()
+        type: "assistant",
+        content:
+          "Sorry, I encountered an error processing your message. Please try again.",
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsSending(false);
     }
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const getFileIcon = (type: string) => {
-    if (type.includes('pdf')) return <FileText className="h-4 w-4 text-red-500" />;
-    if (type.includes('word') || type.includes('document')) return <FileText className="h-4 w-4 text-blue-500" />;
+    if (type.includes("pdf"))
+      return <FileText className="h-4 w-4 text-red-500" />;
+    if (type.includes("word") || type.includes("document"))
+      return <FileText className="h-4 w-4 text-blue-500" />;
     return <Mail className="h-4 w-4 text-green-500" />;
   };
 
@@ -290,7 +327,7 @@ export default function Index() {
     "List the action items and requirements",
     "What financial amounts and costs are discussed?",
     "Compare information across different documents",
-    "Explain the main themes and topics"
+    "Explain the main themes and topics",
   ];
 
   return (
@@ -328,7 +365,11 @@ export default function Index() {
           </Alert>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="upload" className="flex items-center space-x-2">
               <Upload className="h-4 w-4" />
@@ -338,7 +379,10 @@ export default function Index() {
               <MessageCircle className="h-4 w-4" />
               <span>AI Analysis</span>
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="insights"
+              className="flex items-center space-x-2"
+            >
               <BarChart3 className="h-4 w-4" />
               <span>Document Insights</span>
             </TabsTrigger>
@@ -354,7 +398,7 @@ export default function Index() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div 
+                <div
                   className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-12 text-center hover:border-primary/50 transition-colors cursor-pointer"
                   onClick={() => fileInputRef.current?.click()}
                 >
@@ -363,7 +407,9 @@ export default function Index() {
                       <Paperclip className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                      <p className="text-lg font-medium">Click to upload documents</p>
+                      <p className="text-lg font-medium">
+                        Click to upload documents
+                      </p>
                       <p className="text-sm text-muted-foreground mt-2">
                         Upload PDF, DOCX, or email files for AI analysis
                       </p>
@@ -373,7 +419,7 @@ export default function Index() {
                     </div>
                   </div>
                 </div>
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -382,14 +428,14 @@ export default function Index() {
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-                
-                <Button 
+
+                <Button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="w-full"
                   size="lg"
                 >
-                  {isUploading ? 'Processing Documents...' : 'Choose Files'}
+                  {isUploading ? "Processing Documents..." : "Choose Files"}
                 </Button>
               </CardContent>
             </Card>
@@ -400,25 +446,43 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>Processed Documents ({uploadedFiles.length})</span>
-                    <Badge variant="secondary">{uploadedFiles.filter(f => f.processed).length} analyzed</Badge>
+                    <Badge variant="secondary">
+                      {uploadedFiles.filter((f) => f.processed).length} analyzed
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-64">
                     <div className="space-y-2">
                       {uploadedFiles.map((file) => (
-                        <div key={file.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                        <div
+                          key={file.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                        >
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
                             {getFileIcon(file.type)}
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium truncate">{file.name}</p>
+                              <p className="text-sm font-medium truncate">
+                                {file.name}
+                              </p>
                               <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                                 <span>{formatFileSize(file.size)}</span>
-                                {file.wordCount && <span>• {file.wordCount.toLocaleString()} words</span>}
+                                {file.wordCount && (
+                                  <span>
+                                    • {file.wordCount.toLocaleString()} words
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>
-                          <Badge variant={file.processed ? "default" : "outline"} className={file.processed ? "" : "text-orange-600 border-orange-300"}>
+                          <Badge
+                            variant={file.processed ? "default" : "outline"}
+                            className={
+                              file.processed
+                                ? ""
+                                : "text-orange-600 border-orange-300"
+                            }
+                          >
                             {file.processed ? "Analyzed" : "Limited Support"}
                           </Badge>
                         </div>
@@ -440,42 +504,66 @@ export default function Index() {
                       <MessageCircle className="h-5 w-5" />
                       <span>AI Document Analysis</span>
                       {uploadedFiles.length > 0 && (
-                        <Badge variant="outline">{uploadedFiles.length} docs loaded</Badge>
+                        <Badge variant="outline">
+                          {uploadedFiles.length} docs loaded
+                        </Badge>
                       )}
                     </CardTitle>
                   </CardHeader>
-                  
+
                   <Separator />
-                  
+
                   <CardContent className="flex-1 flex flex-col p-0">
                     {/* Messages */}
                     <ScrollArea className="flex-1 p-4">
                       <div className="space-y-4">
                         {messages.map((message) => (
-                          <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                              message.type === 'user' 
-                                ? 'bg-primary text-primary-foreground ml-12' 
-                                : 'bg-muted mr-12'
-                            }`}>
-                              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                              {message.metadata && message.metadata.documentsReferenced > 0 && (
-                                <div className="mt-2 pt-2 border-t border-current/20">
-                                  <p className="text-xs opacity-70">
-                                    📄 Referenced {message.metadata.documentsReferenced} document(s)
-                                    {message.metadata.confidence && (
-                                      <span className="ml-2">• Confidence: {Math.round(message.metadata.confidence * 100)}%</span>
-                                    )}
-                                  </p>
-                                  {message.metadata.documentDetails && (
-                                    <p className="text-xs opacity-60 mt-1">
-                                      Sources: {message.metadata.documentDetails.map((doc: any) => doc.filename).join(', ')}
+                          <div
+                            key={message.id}
+                            className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                                message.type === "user"
+                                  ? "bg-primary text-primary-foreground ml-12"
+                                  : "bg-muted mr-12"
+                              }`}
+                            >
+                              <p className="text-sm whitespace-pre-wrap">
+                                {message.content}
+                              </p>
+                              {message.metadata &&
+                                message.metadata.documentsReferenced > 0 && (
+                                  <div className="mt-2 pt-2 border-t border-current/20">
+                                    <p className="text-xs opacity-70">
+                                      📄 Referenced{" "}
+                                      {message.metadata.documentsReferenced}{" "}
+                                      document(s)
+                                      {message.metadata.confidence && (
+                                        <span className="ml-2">
+                                          • Confidence:{" "}
+                                          {Math.round(
+                                            message.metadata.confidence * 100,
+                                          )}
+                                          %
+                                        </span>
+                                      )}
                                     </p>
-                                  )}
-                                </div>
-                              )}
+                                    {message.metadata.documentDetails && (
+                                      <p className="text-xs opacity-60 mt-1">
+                                        Sources:{" "}
+                                        {message.metadata.documentDetails
+                                          .map((doc: any) => doc.filename)
+                                          .join(", ")}
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
                               <p className="text-xs opacity-70 mt-1">
-                                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {message.timestamp.toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                               </p>
                             </div>
                           </div>
@@ -501,9 +589,13 @@ export default function Index() {
                         <Input
                           value={inputMessage}
                           onChange={(e) => setInputMessage(e.target.value)}
-                          placeholder={uploadedFiles.length > 0 ? "Ask about your documents..." : "Upload documents first to start analysis"}
+                          placeholder={
+                            uploadedFiles.length > 0
+                              ? "Ask about your documents..."
+                              : "Upload documents first to start analysis"
+                          }
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
+                            if (e.key === "Enter" && !e.shiftKey) {
                               e.preventDefault();
                               handleSendMessage();
                             }
@@ -511,7 +603,7 @@ export default function Index() {
                           disabled={isSending}
                           className="flex-1"
                         />
-                        <Button 
+                        <Button
                           onClick={handleSendMessage}
                           disabled={!inputMessage.trim() || isSending}
                           size="icon"
@@ -586,23 +678,36 @@ export default function Index() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-4 bg-muted/50 rounded-lg">
-                        <p className="text-2xl font-bold text-primary">{documentSummary.totalDocuments}</p>
-                        <p className="text-sm text-muted-foreground">Documents</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {documentSummary.totalDocuments}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Documents
+                        </p>
                       </div>
                       <div className="text-center p-4 bg-muted/50 rounded-lg">
-                        <p className="text-2xl font-bold text-primary">{documentSummary.totalWordCount.toLocaleString()}</p>
-                        <p className="text-sm text-muted-foreground">Total Words</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {documentSummary.totalWordCount.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Total Words
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <h4 className="font-medium">Document Types</h4>
-                      {Object.entries(documentSummary.documentTypes).map(([type, count]) => (
-                        <div key={type} className="flex justify-between items-center">
-                          <span className="text-sm">{type}</span>
-                          <Badge variant="secondary">{count}</Badge>
-                        </div>
-                      ))}
+                      {Object.entries(documentSummary.documentTypes).map(
+                        ([type, count]) => (
+                          <div
+                            key={type}
+                            className="flex justify-between items-center"
+                          >
+                            <span className="text-sm">{type}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -616,9 +721,12 @@ export default function Index() {
                       <div className="space-y-2">
                         {documentSummary.documents.map((doc) => (
                           <div key={doc.id} className="p-2 rounded bg-muted/50">
-                            <p className="text-sm font-medium truncate">{doc.filename}</p>
+                            <p className="text-sm font-medium truncate">
+                              {doc.filename}
+                            </p>
                             <p className="text-xs text-muted-foreground">
-                              {doc.wordCount.toLocaleString()} words • {new Date(doc.extractedAt).toLocaleDateString()}
+                              {doc.wordCount.toLocaleString()} words •{" "}
+                              {new Date(doc.extractedAt).toLocaleDateString()}
                             </p>
                           </div>
                         ))}
@@ -631,8 +739,12 @@ export default function Index() {
               <Card>
                 <CardContent className="text-center py-12">
                   <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg font-medium mb-2">No Documents Analyzed Yet</p>
-                  <p className="text-muted-foreground">Upload documents to see insights and statistics</p>
+                  <p className="text-lg font-medium mb-2">
+                    No Documents Analyzed Yet
+                  </p>
+                  <p className="text-muted-foreground">
+                    Upload documents to see insights and statistics
+                  </p>
                 </CardContent>
               </Card>
             )}

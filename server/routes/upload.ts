@@ -6,40 +6,55 @@ import fs from "fs";
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads');
+    const uploadDir = path.join(process.cwd(), "uploads");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname),
+    );
+  },
 });
 
-const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (
+  req: any,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback,
+) => {
   const allowedTypes = [
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/msword',
-    'message/rfc822',
-    'text/plain'
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "message/rfc822",
+    "text/plain",
   ];
-  
-  if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.eml') || file.originalname.endsWith('.msg')) {
+
+  if (
+    allowedTypes.includes(file.mimetype) ||
+    file.originalname.endsWith(".eml") ||
+    file.originalname.endsWith(".msg")
+  ) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only PDF, DOCX, and email files are allowed.'));
+    cb(
+      new Error(
+        "Invalid file type. Only PDF, DOCX, and email files are allowed.",
+      ),
+    );
   }
 };
 
-export const upload = multer({ 
+export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  }
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
 });
 
 import { SimpleDocumentProcessor } from "../services/simpleDocumentProcessor";
@@ -48,10 +63,10 @@ import { simpleDocumentStore } from "../services/simpleDocumentStore";
 export const handleFileUpload: RequestHandler = async (req, res) => {
   try {
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-      return res.status(400).json({ error: 'No files uploaded' });
+      return res.status(400).json({ error: "No files uploaded" });
     }
 
-    const { userId = 'default' } = req.body;
+    const { userId = "default" } = req.body;
     const processedFiles = [];
     const errors = [];
 
@@ -61,7 +76,7 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
         const processedDoc = await SimpleDocumentProcessor.processDocument(
           file.path,
           file.originalname,
-          file.mimetype
+          file.mimetype,
         );
 
         // Store the processed document
@@ -73,13 +88,13 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
           type: file.mimetype,
           size: file.size,
           wordCount: processedDoc.metadata.wordCount,
-          processed: processedDoc.metadata.processed
+          processed: processedDoc.metadata.processed,
         });
       } catch (error) {
         console.error(`Error processing file ${file.originalname}:`, error);
         errors.push({
           filename: file.originalname,
-          error: error instanceof Error ? error.message : 'Processing failed'
+          error: error instanceof Error ? error.message : "Processing failed",
         });
 
         // Still add as unprocessed file
@@ -88,7 +103,7 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
           name: file.originalname,
           type: file.mimetype,
           size: file.size,
-          processed: false
+          processed: false,
         });
       }
     }
@@ -97,38 +112,38 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
       success: true,
       files: processedFiles,
       message: `Successfully uploaded ${processedFiles.length} file(s)`,
-      processingErrors: errors.length > 0 ? errors : undefined
+      processingErrors: errors.length > 0 ? errors : undefined,
     };
 
     res.json(response);
   } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Failed to upload files' });
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Failed to upload files" });
   }
 };
 
 export const getUploadedFiles: RequestHandler = (req, res) => {
   try {
-    const uploadDir = path.join(process.cwd(), 'uploads');
+    const uploadDir = path.join(process.cwd(), "uploads");
     if (!fs.existsSync(uploadDir)) {
       return res.json({ files: [] });
     }
 
-    const files = fs.readdirSync(uploadDir).map(filename => {
+    const files = fs.readdirSync(uploadDir).map((filename) => {
       const filePath = path.join(uploadDir, filename);
       const stats = fs.statSync(filePath);
-      
+
       return {
         id: filename,
         name: filename,
         size: stats.size,
-        uploadedAt: stats.ctime
+        uploadedAt: stats.ctime,
       };
     });
 
     res.json({ files });
   } catch (error) {
-    console.error('Error fetching files:', error);
-    res.status(500).json({ error: 'Failed to fetch files' });
+    console.error("Error fetching files:", error);
+    res.status(500).json({ error: "Failed to fetch files" });
   }
 };
