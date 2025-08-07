@@ -22,12 +22,21 @@
   },
   "dependencies": {
     "@types/multer": "^2.0.0",
+    "cheerio": "^1.1.2",
+    "cosine-similarity": "^1.0.1",
     "dotenv": "^17.2.0",
     "express": "^4.18.2",
+    "jsdom": "^26.1.0",
     "mailparser": "^3.7.4",
     "mammoth": "^1.10.0",
+    "ml-matrix": "^6.12.1",
     "multer": "^2.0.2",
+    "natural": "^8.1.0",
     "node-html-parser": "^7.0.1",
+    "pdf-parse-new": "^1.4.1",
+    "pdf2pic": "^3.2.0",
+    "sentence-splitter": "^5.0.0",
+    "stopword": "^3.1.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
