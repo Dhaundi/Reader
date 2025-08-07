@@ -86,6 +86,22 @@ export class SimpleAI {
       return "I couldn't find any relevant information in your uploaded documents. Please make sure you've uploaded documents that contain the information you're looking for.";
     }
 
+    // Check if any documents are actually processed
+    const processedDocs = documents.filter(doc => doc.metadata.processed);
+    const unprocessedDocs = documents.filter(doc => !doc.metadata.processed);
+
+    if (processedDocs.length === 0 && unprocessedDocs.length > 0) {
+      return `I can see you've uploaded ${unprocessedDocs.length} document(s), but I can't analyze their content because they have limited support (likely PDF files).
+
+For full document analysis, please upload:
+• DOCX or DOC files (Microsoft Word)
+• HTML files
+• Email files (.eml, .msg)
+• Plain text files (.txt)
+
+These formats allow me to extract and analyze the text content to answer your questions.`;
+    }
+
     const combinedContent = documents.slice(0, 3).map(doc => doc.content).join('\n\n');
     
     switch (queryType) {
