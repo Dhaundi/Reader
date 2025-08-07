@@ -102,7 +102,13 @@ For full document analysis, please upload:
 These formats allow me to extract and analyze the text content to answer your questions.`;
     }
 
-    const combinedContent = documents.slice(0, 3).map(doc => doc.content).join('\n\n');
+    // Use only processed documents for analysis
+    const combinedContent = processedDocs.slice(0, 3).map(doc => doc.content).join('\n\n');
+
+    if (processedDocs.length === 0) {
+      // This case is handled above, but adding as safety
+      return "No documents available for analysis.";
+    }
     
     switch (queryType) {
       case 'summary':
