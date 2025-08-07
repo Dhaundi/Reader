@@ -31,7 +31,7 @@ export const handleChat: RequestHandler = async (req, res) => {
       systemPrompt += `The user has uploaded ${userDocuments.length} document(s). Use the document content provided below to answer their questions accurately. If the question cannot be answered from the documents, say so clearly.`;
       
       // Search for relevant documents based on the query
-      const relevantDocs = await DocumentProcessor.searchDocuments(userDocuments, message);
+      const relevantDocs = DocumentProcessor.searchDocuments(userDocuments, message);
       
       if (relevantDocs.length > 0) {
         documentContext = '\n\nDocument Context:\n';
