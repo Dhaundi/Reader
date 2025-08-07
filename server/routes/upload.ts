@@ -42,25 +42,65 @@ export const upload = multer({
   }
 });
 
+import { DocumentProcessor } from "../services/documentProcessor";
+import { documentStore } from "../services/documentStore";
+
 export const handleFileUpload: RequestHandler = async (req, res) => {
   try {
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const uploadedFiles = req.files.map((file: Express.Multer.File) => ({
-      id: file.filename,
-      name: file.originalname,
-      type: file.mimetype,
-      size: file.size,
-      path: file.path
-    }));
+    const { userId = 'default' } = req.body;
+    const processedFiles = [];
+    const errors = [];
 
-    res.json({ 
-      success: true, 
-      files: uploadedFiles,
-      message: `Successfully uploaded ${uploadedFiles.length} file(s)`
-    });
+    for (const file of req.files) {
+      try {
+        // Process the document to extract text
+        const processedDoc = await DocumentProcessor.processDocument(
+          file.path,
+          file.originalname,
+          file.mimetype
+        );
+
+        // Store the processed document
+        documentStore.addDocument(processedDoc, userId);
+
+        processedFiles.push({
+          id: processedDoc.id,
+          name: file.originalname,
+          type: file.mimetype,
+          size: file.size,
+          wordCount: processedDoc.metadata.wordCount,
+          processed: true
+        });
+      } catch (error) {
+        console.error(`Error processing file ${file.originalname}:`, error);
+        errors.push({
+          filename: file.originalname,
+          error: error instanceof Error ? error.message : 'Processing failed'
+        });
+
+        // Still add as unprocessed file
+        processedFiles.push({
+          id: file.filename,
+          name: file.originalname,
+          type: file.mimetype,
+          size: file.size,
+          processed: false
+        });
+      }
+    }
+
+    const response = {
+      success: true,
+      files: processedFiles,
+      message: `Successfully uploaded ${processedFiles.length} file(s)`,
+      processingErrors: errors.length > 0 ? errors : undefined
+    };
+
+    res.json(response);
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({ error: 'Failed to upload files' });
