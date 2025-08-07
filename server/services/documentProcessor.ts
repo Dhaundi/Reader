@@ -82,7 +82,7 @@ export class DocumentProcessor {
       if (parsed.subject) content += `Subject: ${parsed.subject}\n\n`;
       if (parsed.from?.text) content += `From: ${parsed.from.text}\n`;
       if (parsed.to) {
-        const toText = Array.isArray(parsed.to) ? parsed.to.map(addr => addr.text || addr.address || '').join(', ') : (parsed.to.text || parsed.to.address || '');
+        const toText = Array.isArray(parsed.to) ? parsed.to.map(addr => (addr as any).text || (addr as any).address || '').join(', ') : ((parsed.to as any).text || (parsed.to as any).address || '');
         content += `To: ${toText}\n`;
       }
       if (parsed.date) content += `Date: ${parsed.date}\n\n`;
