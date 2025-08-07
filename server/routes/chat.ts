@@ -50,26 +50,32 @@ export const handleChat: RequestHandler = async (req, res) => {
     }
 
     // Handle Google AI specific errors
-    if (error && typeof error === 'object' && 'message' in error) {
-      const errorMessage = (error as any).message;
-      
-      if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
-        return res.status(429).json({ 
-          error: 'Google AI API quota exceeded. Please check your billing details or try again later.',
+    if (error && typeof error === 'object') {
+      const errorObj = error as any;
+
+      // Check for GoogleGenerativeAIFetchError with status 429
+      if (errorObj.status === 429 ||
+          (errorObj.message && errorObj.message.includes('quota')) ||
+          (errorObj.message && errorObj.message.includes('limit')) ||
+          (errorObj.message && errorObj.message.includes('RATE_LIMIT_EXCEEDED'))) {
+        return res.status(429).json({
+          error: 'Google AI API rate limit exceeded. Please wait a moment and try again.',
           type: 'quota_exceeded'
         });
       }
-      
-      if (errorMessage.includes('API key')) {
-        return res.status(401).json({ 
+
+      if (errorObj.status === 401 || (errorObj.message && errorObj.message.includes('API key'))) {
+        return res.status(401).json({
           error: 'Google AI API key invalid or unauthorized.',
           type: 'auth_error'
         });
       }
 
-      return res.status(500).json({ 
-        error: 'Google AI API error: ' + errorMessage 
-      });
+      if ('message' in errorObj) {
+        return res.status(500).json({
+          error: 'Google AI API error: ' + errorObj.message
+        });
+      }
     }
 
     res.status(500).json({ error: 'Failed to process chat message' });
