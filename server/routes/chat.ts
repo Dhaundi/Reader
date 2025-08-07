@@ -12,18 +12,23 @@ export const handleChat: RequestHandler = async (req, res) => {
   try {
     const { message, userId } = ChatRequestSchema.parse(req.body);
 
-    // Temporary simplified response while debugging upload issues
+    // Get user's documents
+    const userDocuments = simpleDocumentStore.getUserDocuments(userId);
+
+    // Process the query using Simple AI
+    const aiResult = await SimpleAI.processQuery(message, userDocuments);
+
     res.json({
       success: true,
-      response: "I'm currently in debugging mode. Please upload your documents first, and I'll be able to analyze them once the upload system is fully restored.",
+      response: aiResult.answer,
       metadata: {
-        documentsReferenced: 0,
-        documentDetails: [],
-        totalDocuments: 0,
-        confidence: 0.8,
-        queryType: 'debug',
-        aiType: 'debug-mode',
-        processingTime: 10
+        documentsReferenced: aiResult.documentsReferenced,
+        documentDetails: aiResult.documentDetails,
+        totalDocuments: userDocuments.length,
+        confidence: aiResult.confidence,
+        queryType: aiResult.queryType,
+        aiType: 'simple-ai',
+        processingTime: 50
       },
       timestamp: new Date().toISOString()
     });
