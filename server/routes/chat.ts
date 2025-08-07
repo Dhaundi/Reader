@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
-import { groqAI } from "../services/groqAI";
-import { advancedDocumentStore } from "../services/advancedDocumentStore";
+import { SimpleAI } from "../services/simpleAI";
+import { simpleDocumentStore } from "../services/simpleDocumentStore";
 
 const ChatRequestSchema = z.object({
   message: z.string().min(1),
