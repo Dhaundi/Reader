@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
-import { QueryProcessor } from "../services/queryProcessor";
+import { groqAI } from "../services/groqAI";
 import { advancedDocumentStore } from "../services/advancedDocumentStore";
 
 const ChatRequestSchema = z.object({
