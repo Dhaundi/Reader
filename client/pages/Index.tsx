@@ -209,7 +209,26 @@ export default function Index() {
         };
         setMessages(prev => [...prev, assistantMessage]);
       } else {
-        // Custom AI doesn't have external API limitations
+        if (result.type === 'quota_exceeded' || result.error?.includes('Rate limit')) {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'assistant',
+            content: '⚠️ Groq AI rate limit exceeded. Please wait a moment and try again.',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          return;
+        }
+        if (result.type === 'auth_error' || result.error?.includes('authentication')) {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            type: 'assistant',
+            content: '⚠️ Groq AI authentication failed. Please check the API configuration.',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          return;
+        }
         throw new Error(result.error || 'Chat failed');
       }
     } catch (err) {
