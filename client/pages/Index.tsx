@@ -21,6 +21,9 @@ interface Message {
       type: string;
       wordCount: number;
     }>;
+    confidence?: number;
+    queryType?: string;
+    aiType?: string;
   };
 }
 
