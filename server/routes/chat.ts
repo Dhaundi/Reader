@@ -156,18 +156,21 @@ export const searchDocuments: RequestHandler = async (req, res) => {
     }
 
     const userDocuments = advancedDocumentStore.getUserDocuments(userId as string);
-    const results = await QueryProcessor.processQuery(query, userDocuments);
-    
+    const results = await groqAI.processQuery(query, userDocuments);
+
     res.json({
       success: true,
       query,
       results: {
         answer: results.answer,
-        sources: results.sources,
         confidence: results.confidence,
-        queryType: results.queryType
+        queryType: results.queryType,
+        documentDetails: results.documentDetails
       },
-      metadata: results.metadata
+      metadata: {
+        processingTime: results.processingTime,
+        documentsReferenced: results.documentsReferenced
+      }
     });
   } catch (error) {
     console.error('Search error:', error);
