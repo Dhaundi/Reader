@@ -24,6 +24,7 @@ export function createServer() {
 
   // File upload routes
   app.post("/api/upload", upload.array('files'), handleFileUpload);
+  app.post("/api/upload-debug", debugUpload.array('files'), handleDebugUpload);
   app.get("/api/files", getUploadedFiles);
 
   // AI Chat routes
