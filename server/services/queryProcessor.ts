@@ -93,7 +93,8 @@ export class QueryProcessor {
     }
 
     // Extract entities and keywords
-    const tokens = natural.WordTokenizer().tokenize(query) || [];
+    const tokenizer = new natural.WordTokenizer();
+    const tokens = tokenizer.tokenize(query) || [];
     const keywords = tokens.filter(token => 
       token.length > 3 && 
       !/\b(what|how|when|where|why|who|is|are|the|and|or|but|in|on|at|to|for|of|with|by)\b/i.test(token)
