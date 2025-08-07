@@ -97,7 +97,8 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
 export const getChatCapabilities: RequestHandler = (req, res) => {
   res.json({
     capabilities: [
-      'Advanced Document Analysis with RAG',
+      'Groq AI-Powered RAG System',
+      'Advanced Llama 3 Language Model',
       'Semantic Search & Retrieval',
       'Multi-format Text Extraction (PDF, DOCX, HTML, Email)',
       'Document Chunking & Preprocessing',
@@ -108,10 +109,10 @@ export const getChatCapabilities: RequestHandler = (req, res) => {
     ],
     supportedFileTypes: ['PDF', 'DOCX', 'DOC', 'HTML', 'EML', 'MSG', 'TXT'],
     features: [
-      'No external API dependencies',
+      'Groq AI ultra-fast inference',
       'Vector-based semantic search',
       'TF-IDF document indexing',
-      'Named entity extraction',
+      'Advanced language understanding',
       'Multi-document context synthesis',
       'Query type classification',
       'Real-time processing',
