@@ -278,7 +278,8 @@ export class AdvancedDocumentProcessor {
   private static extractKeywords(text: string): string[] {
     try {
       // Tokenize and clean
-      const tokens = natural.WordTokenizer().tokenize(text.toLowerCase()) || [];
+      const tokenizer = new natural.WordTokenizer();
+      const tokens = tokenizer.tokenize(text.toLowerCase()) || [];
       
       // Remove stopwords
       const filteredTokens = removeStopwords(tokens);
