@@ -58,14 +58,14 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
     for (const file of req.files) {
       try {
         // Process the document to extract text
-        const processedDoc = await DocumentProcessor.processDocument(
+        const processedDoc = await AdvancedDocumentProcessor.processDocument(
           file.path,
           file.originalname,
           file.mimetype
         );
 
-        // Store the processed document
-        documentStore.addDocument(processedDoc, userId);
+        // Store the processed document with semantic indexing
+        advancedDocumentStore.addDocument(processedDoc, userId);
 
         processedFiles.push({
           id: processedDoc.id,
