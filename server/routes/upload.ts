@@ -43,6 +43,7 @@ export const upload = multer({
 });
 
 import { SimpleDocumentProcessor } from "../services/simpleDocumentProcessor";
+import { simpleDocumentStore } from "../services/simpleDocumentStore";
 
 export const handleFileUpload: RequestHandler = async (req, res) => {
   try {
