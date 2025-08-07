@@ -495,12 +495,12 @@ export default function Index() {
                     </CardHeader>
                     <CardContent className="text-xs space-y-2">
                       <div className="space-y-1">
-                        <p className="font-medium">🧠 Vector Embeddings</p>
+                        <p className="font-medium">⚡ Groq Ultra-Fast AI</p>
+                        <p className="font-medium">🦙 Llama 3 Language Model</p>
                         <p className="font-medium">🔍 Semantic Search</p>
                         <p className="font-medium">📄 Multi-format Support</p>
                         <p className="font-medium">📊 Confidence Scoring</p>
                         <p className="font-medium">🎯 Source Attribution</p>
-                        <p className="font-medium">⚡ Real-time RAG</p>
                       </div>
                     </CardContent>
                   </Card>
