@@ -56,8 +56,14 @@ export const handleChat: RequestHandler = async (req, res) => {
     }
 
     if (error instanceof OpenAI.APIError) {
-      return res.status(500).json({ 
-        error: 'OpenAI API error: ' + error.message 
+      if (error.status === 429) {
+        return res.status(429).json({
+          error: 'OpenAI API quota exceeded. Please check your billing details or try again later.',
+          type: 'quota_exceeded'
+        });
+      }
+      return res.status(500).json({
+        error: 'OpenAI API error: ' + error.message
       });
     }
 
