@@ -29,6 +29,7 @@
     "mammoth": "^1.10.0",
     "multer": "^2.0.2",
     "node-html-parser": "^7.0.1",
+    "pdfjs-dist": "^5.4.54",
     "zod": "^3.23.8"
   },
   "devDependencies": {

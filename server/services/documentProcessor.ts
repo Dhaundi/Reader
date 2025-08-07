@@ -3,6 +3,7 @@ import path from 'path';
 import mammoth from 'mammoth';
 import { simpleParser } from 'mailparser';
 import { parse } from 'node-html-parser';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 
 export interface ProcessedDocument {
   id: string;
