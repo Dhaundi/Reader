@@ -55,8 +55,8 @@ export const getChatHistory: RequestHandler = (req, res) => {
 export const getDocumentSummary: RequestHandler = (req, res) => {
   try {
     const { userId = 'default' } = req.query;
-    const userDocuments = advancedDocumentStore.getUserDocuments(userId as string);
-    
+    const userDocuments = simpleDocumentStore.getUserDocuments(userId as string);
+
     const summary = {
       totalDocuments: userDocuments.length,
       totalWordCount: userDocuments.reduce((sum, doc) => sum + doc.metadata.wordCount, 0),
@@ -84,7 +84,7 @@ export const getDocumentSummary: RequestHandler = (req, res) => {
         extractedAt: doc.metadata.extractedAt,
         keywords: doc.metadata.keywords.slice(0, 5)
       })),
-      indexStats: advancedDocumentStore.getIndexStats()
+      indexStats: simpleDocumentStore.getStats()
     };
 
     res.json(summary);
@@ -156,8 +156,8 @@ export const searchDocuments: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
-    const userDocuments = advancedDocumentStore.getUserDocuments(userId as string);
-    const results = await groqAI.processQuery(query, userDocuments);
+    const userDocuments = simpleDocumentStore.getUserDocuments(userId as string);
+    const results = await SimpleAI.processQuery(query, userDocuments);
 
     res.json({
       success: true,
