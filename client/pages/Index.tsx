@@ -475,28 +475,47 @@ export default function Index() {
 
               {/* Suggested Questions */}
               <div className="lg:col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm flex items-center space-x-2">
-                      <Search className="h-4 w-4" />
-                      <span>Suggested Questions</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {suggestedQuestions.map((question, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-left h-auto p-2 text-xs"
-                        onClick={() => setInputMessage(question)}
-                        disabled={uploadedFiles.length === 0}
-                      >
-                        {question}
-                      </Button>
-                    ))}
-                  </CardContent>
-                </Card>
+                <div className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center space-x-2">
+                        <Brain className="h-4 w-4" />
+                        <span>AI Capabilities</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs space-y-2">
+                      <div className="space-y-1">
+                        <p className="font-medium">✨ No API Dependencies</p>
+                        <p className="font-medium">📄 Document Analysis</p>
+                        <p className="font-medium">🔍 Pattern Recognition</p>
+                        <p className="font-medium">💬 Context Aware</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center space-x-2">
+                        <Search className="h-4 w-4" />
+                        <span>Try These Questions</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {suggestedQuestions.map((question, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-left h-auto p-2 text-xs"
+                          onClick={() => setInputMessage(question)}
+                          disabled={uploadedFiles.length === 0}
+                        >
+                          {question}
+                        </Button>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           </TabsContent>
