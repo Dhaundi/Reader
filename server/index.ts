@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleFileUpload, upload, getUploadedFiles } from "./routes/upload";
+import { handleDebugUpload, debugUpload } from "./routes/upload-debug";
 import { handleChat, getChatHistory, getDocumentSummary, getChatCapabilities, searchDocuments } from "./routes/chat";
 
 export function createServer() {
