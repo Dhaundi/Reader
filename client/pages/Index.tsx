@@ -284,7 +284,7 @@ export default function Index() {
               <h1 className="text-xl font-bold">Smart DocAnalyzer</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
-              Powered by Groq AI
+              Document AI System
             </Badge>
           </div>
         </div>
