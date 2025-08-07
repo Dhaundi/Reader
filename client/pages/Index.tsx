@@ -279,7 +279,7 @@ export default function Index() {
               <h1 className="text-xl font-bold">DocAI Analyst</h1>
             </div>
             <Badge variant="secondary" className="text-xs">
-              Powered by Google AI
+              Custom AI Engine
             </Badge>
           </div>
         </div>
