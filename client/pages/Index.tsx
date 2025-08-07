@@ -55,7 +55,7 @@ export default function Index() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your advanced RAG-powered document analyst. I use semantic search, vector embeddings, and intelligent chunking to understand your documents deeply. I can analyze PDF, DOCX, HTML, and email files with high accuracy and provide source-backed answers. Upload documents and ask complex questions!',
+      content: 'Hello! I\'m your Groq AI-powered document analyst using Llama 3 for ultra-fast, intelligent responses. I combine semantic search, vector embeddings, and advanced language understanding to analyze your documents. I can process PDF, DOCX, HTML, and email files with high accuracy and provide detailed, source-backed answers. Upload documents and ask me anything!',
       timestamp: new Date()
     }
   ]);
