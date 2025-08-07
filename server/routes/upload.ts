@@ -57,14 +57,11 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
     for (const file of req.files) {
       try {
         // Process the document to extract text
-        const processedDoc = await AdvancedDocumentProcessor.processDocument(
+        const processedDoc = await SimpleDocumentProcessor.processDocument(
           file.path,
           file.originalname,
           file.mimetype
         );
-
-        // Store the processed document with semantic indexing
-        advancedDocumentStore.addDocument(processedDoc, userId);
 
         processedFiles.push({
           id: processedDoc.id,
@@ -72,7 +69,7 @@ export const handleFileUpload: RequestHandler = async (req, res) => {
           type: file.mimetype,
           size: file.size,
           wordCount: processedDoc.metadata.wordCount,
-          processed: true
+          processed: processedDoc.metadata.processed
         });
       } catch (error) {
         console.error(`Error processing file ${file.originalname}:`, error);
